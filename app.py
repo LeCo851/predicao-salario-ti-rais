@@ -46,7 +46,6 @@ class TamanhoEmpresaEnum(str, Enum):
     MAIS_DE_1000 = "1000 ou mais funcionários"
 
 class SetorIbgeEnum(str, Enum):
-    # Principais subsetores IBGE (simplificado para o TCC)
     EXTRA_MINERAL = "Extrativa Mineral" # 1
     IND_METALURGICA = "Indústria Metalúrgica" # 2
     IND_MECANICA = "Indústria Mecânica" # 3
@@ -72,9 +71,6 @@ class SetorIbgeEnum(str, Enum):
     ADM_PUBLICA = "Administração Pública" # 23
     AGRICULTURA = "Agricultura e Pesca" # 24 e 25
 
-# --- SEU ENUM DE CARGOS (Mantenha o que você gerou no notebook) ---
-# Cole aqui o class CargoEnum que você gerou no passo anterior do notebook.
-# Vou deixar resumido para o exemplo funcionar.
 class CargoEnum(str, Enum):
     ADMINISTRADOR_DE_BANCO_DE_DADOS = "Administrador de banco de dados"
     ADMINISTRADOR_DE_REDES = "Administrador de redes"
@@ -116,7 +112,7 @@ class CargoEnum(str, Enum):
 mapa_escolaridade = {
     "Analfabeto": 1,
     "Fundamental Incompleto": 2, # Abrange até 5a incomp
-    "Fundamental Completo": 6,   # Ajuste conforme seu agrupamento no notebook
+    "Fundamental Completo": 6,  
     "Médio Incompleto": 5,
     "Médio Completo": 7,
     "Superior Incompleto": 8,
@@ -162,7 +158,7 @@ mapa_setor = {
     "Médicos, Odontológicos e Veterinários": 21,
     "Ensino": 22,
     "Administração Pública": 23,
-    "Agricultura e Pesca": 25 # Agrupando 24 e 25
+    "Agricultura e Pesca": 25
 }
 
 mapa_sexo = {
@@ -265,16 +261,13 @@ def prever_salario(dados: DadosProfissional):
         # 3. UF
         val_uf = mapa_medias['uf'].get(dados.uf.upper(), media_global)
         
-        # 4. Tamanho (O modelo foi treinado com float ou int? Geralmente Target Encoding converte a categoria)
-        # Assumindo que no treino 'tamanho_estabelecimento' era categórico convertido para média
+        # 4. Tamanho da Empresa
         val_tam = mapa_medias['tam'].get(str(cod_tamanho), media_global)
         
         # 5. Setor
         val_setor = mapa_medias['setor'].get(str(cod_setor), media_global)
 
         # 6. Sexo e Raça (Label Encoding)
-        # O modelo espera 0, 1, 2... gerados pelo LabelEncoder.
-        # Precisamos passar o código RAIS (1, 2) pelo encoder salvo.
         try:
             val_sexo_encoded = encoders['sexo'].transform([str(cod_sexo_rais)])[0]
             val_raca_encoded = encoders['raca_cor_valor'].transform([str(cod_raca_rais)])[0]
@@ -307,7 +300,6 @@ def prever_salario(dados: DadosProfissional):
                 "cargo_selecionado": dados.cargo.value,
                 "salario_estimado": f"R$ {round(float(salario_reais), 2):.2f}".replace('.', ','),
                 "detalhes_perfil": {
-                    #"nivel_experiencia_sugerido": "Júnior/Pleno" if dados.idade < 30 else "Sênior/Especialista",
                     "porte_empresa": dados.tamanho_empresa.value,
                     "setor_atuacao": dados.setor.value
                 }
